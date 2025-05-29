@@ -1,0 +1,25 @@
+
+
+Query theke data test korar jnno get_usermodel use kora hoi,,
+
+proces:
+    from django.contrib.auth import get_user_model
+
+
+
+    User = get_user_model() # defined
+
+
+
+    then use it,,
+    
+    for clarification see SendOtpView class in users.views
+
+
+
+magic link niye vabte hbe,,
+for verify otp
+
+
+###### PermissionMixin use korte hbe admin.py teo change korte hbe,,
+mind it
