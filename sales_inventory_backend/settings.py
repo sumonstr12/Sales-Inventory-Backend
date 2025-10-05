@@ -1,5 +1,5 @@
 
-
+import os
 from pathlib import Path
 from datetime import timedelta
 
@@ -27,6 +27,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'users',
+    'home',
+    'products',
+    'categories',
+    'customers',
+    'invoices',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist'
+    
 ]
 
 AUTH_USER_MODEL = "users.User"
@@ -65,14 +73,21 @@ WSGI_APPLICATION = 'sales_inventory_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'inventory_db',  # always just change the DB name (onno kisu korte hbe na)
+#         'USER': 'sumon',
+#         'PASSWORD': 'sumon',
+#         'HOST': 'localhost',  
+#         'PORT': '5432',       
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Sales Inventory Backend',  # always just change the DB name (onno kisu korte hbe na)
-        'USER': 'postgres',
-        'PASSWORD': 'sumontithy',
-        'HOST': 'localhost',  
-        'PORT': '5412',       
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -113,6 +128,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -120,11 +138,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Rest Framework Config
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES":(
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
 }
-
 
 # Email Configuration
 # Main Configuration
@@ -135,7 +152,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Simple JWT Configuration
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(weeks=4),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,

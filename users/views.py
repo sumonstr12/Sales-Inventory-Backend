@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model, authenticate
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
-from .serializers import UserRegistrationSerializer, UserUpdateSerializer
+from .serializers import UserRegistrationSerializer, UserUpdateSerializer, UserProfileSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.mail import send_mail
 
@@ -15,12 +15,15 @@ User = get_user_model()  # This will use the custom User model defined in users/
 class UserRegistrationView(APIView):
     def post(self, request):
         serializer = UserRegistrationSerializer(data = request.data)
+        print(serializer)
         if serializer.is_valid():
             serializer.save()
             return Response({
                 'success': "Success",
                 "message": "User Registration Successully",
             }, status=status.HTTP_201_CREATED)
+        
+        print("validation error", serializer.errors)
         return Response(
             {
             "success": False,
@@ -37,11 +40,25 @@ class UserLoginView(APIView):
         
         if user:
             refresh = RefreshToken.for_user(user)
-            return Response({
+            response = Response({
                 "status": "success",
                 "message": "User Login Successfully.",
                 "token": str(refresh.access_token),
+                "refresh_token" : str(refresh),
             }, status=status.HTTP_200_OK)
+
+            refresh_token = str(refresh)
+
+            response.set_cookie(
+                key="refresh_token",
+                value=refresh_token,
+                secure=True,
+                httponly=True,
+                max_age= 30 * 24 * 60 * 60,
+                samesite="strict"
+            )
+
+            return response
         
         return Response({
             "status": "error",
@@ -137,13 +154,14 @@ class LogoutView(APIView):
     def post(self, request):
         # Invalidate the token by simply deleting it on the client side
         try:
-            token = request.data["token"]  # Get the token from the request data
+            refresh_token = request.COOKIES.get("refresh_token")  # Get the token from the request data
+            print(refresh_token)
             if not token:
                 return Response({
                     "status": "error",
                     "message": "Token is required for logout."
                 }, status=status.HTTP_400_BAD_REQUEST)
-            token = RefreshToken(token)
+            token = RefreshToken(refresh_token)
             token.blacklist()  # Blacklist the token to prevent further use
             return Response({
                 "status": "success",
@@ -174,4 +192,21 @@ class UpdateUserProfileView(APIView):
         return Response({
             "status": "success",
             "message": "User Profile Updated Successfully",
+        }, status=status.HTTP_200_OK)
+
+
+
+
+class UserProfileView(APIView):
+    permission_classes = (
+        permissions.IsAuthenticated,  # Ensure the user is authenticated to view profile
+    )
+
+    def get(self, request):
+        user = request.user
+        serializer = UserProfileSerializer(user)
+        return Response({
+            "status": "success",
+            "message": "User Profile Retrieved Successfully",
+            "data": serializer.data
         }, status=status.HTTP_200_OK)

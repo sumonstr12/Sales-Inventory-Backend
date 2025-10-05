@@ -23,3 +23,24 @@ for verify otp
 
 ###### PermissionMixin use korte hbe admin.py teo change korte hbe,,
 mind it
+
+
+##### search api standards/ endpoints / api route structure
+
+##### pk and uuid on routes
+
+
+##### django free deploy korar jnno cpanel(website) use korte hoi
+
+
+#####
+filter(): একাধিক ফলাফল ফেরত দিতে পারে (0-এর বেশি), এবং আপনি লুপ ব্যবহার করে সেগুলো ঘুরতে পারেন।
+get(): শুধুমাত্র একটি ফলাফল খুঁজে বের করার জন্য, এবং যদি একাধিক ফলাফল পাওয়া যায় বা কিছুই না পাওয়া যায়, তবে তা ত্রুটি হিসেবে ফেলে।
+
+Note: get() use korle must use try() except , otherwise application 
+      crush korbe....
+    
+*** সারাংশ (কখন কী ব্যবহার করবেন): ***
+--> একাধিক ফলাফল চাইলে: filter() (যেমন, একটি SuperUser-এর সব Product দেখতে)।
+--> নির্দিষ্ট একটি ফলাফল চাইলে: get() (যেমন, একটি নির্দিষ্ট Product ID দিয়ে সার্চ করতে)।
+--> ত্রুটি হ্যান্ডলিং: get() ব্যবহার করলে try-except দরকার, filter()-এর ক্ষেত্রে না।
