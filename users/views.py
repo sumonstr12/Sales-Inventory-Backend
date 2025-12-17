@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model, authenticate
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
+from rest_framework.permissions import IsAuthenticated
 from .serializers import UserRegistrationSerializer, UserUpdateSerializer, UserProfileSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.mail import send_mail
@@ -13,6 +14,7 @@ from django.core.mail import send_mail
 User = get_user_model()  # This will use the custom User model defined in users/models.py
 
 class UserRegistrationView(APIView):
+    permission_classes = []
     def post(self, request):
         serializer = UserRegistrationSerializer(data = request.data)
         print(serializer)
@@ -32,6 +34,7 @@ class UserRegistrationView(APIView):
 
 
 class UserLoginView(APIView):
+    permission_classes = []
     def post(self, request):
         email = request.data.get("email")
         password = request.data.get("password")
@@ -67,6 +70,7 @@ class UserLoginView(APIView):
 
 
 class SendOtpView(APIView):
+
     def post(self, request):
         # Logic to send OTP to the user
         email = request.data.get("email")
@@ -129,7 +133,7 @@ class VerifyOtpView(APIView):
 class ResetPasswordView(APIView):
     # We inherit from APIView to create a custom view for resetting the password
     permission_classes = (
-        permissions.IsAuthenticated, # Ensure the user is authenticated to reset password
+        IsAuthenticated, # Ensure the user is authenticated to reset password
     )
 
     def post(self, request):
@@ -149,19 +153,18 @@ class ResetPasswordView(APIView):
 
 
 class LogoutView(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, request):
         # Invalidate the token by simply deleting it on the client side
         try:
-            refresh_token = request.COOKIES.get("refresh_token")  # Get the token from the request data
-            print(refresh_token)
-            if not token:
+            refresh_token_value = request.COOKIES.get("refresh_token")  # Get the token from the request data
+            print(refresh_token_value)
+            if not refresh_token_value:
                 return Response({
                     "status": "error",
                     "message": "Token is required for logout."
                 }, status=status.HTTP_400_BAD_REQUEST)
-            token = RefreshToken(refresh_token)
+            token = RefreshToken(refresh_token_value)
             token.blacklist()  # Blacklist the token to prevent further use
             return Response({
                 "status": "success",
@@ -176,7 +179,7 @@ class LogoutView(APIView):
 
 class UpdateUserProfileView(APIView):
     permission_classes = (
-        permissions.IsAuthenticated, # Ensure the user is authenticated to reset password
+        IsAuthenticated, # Ensure the user is authenticated to reset password
     )
 
     def post(self, request):
@@ -199,7 +202,7 @@ class UpdateUserProfileView(APIView):
 
 class UserProfileView(APIView):
     permission_classes = (
-        permissions.IsAuthenticated,  # Ensure the user is authenticated to view profile
+        IsAuthenticated,  # Ensure the user is authenticated to view profile
     )
 
     def get(self, request):

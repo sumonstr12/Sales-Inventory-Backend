@@ -1,0 +1,4 @@
+In serializers class
+SerializerMethodField() use kora hoi jate kore extra jeson informaton 
+model e nai but indirectly function use kore paoua possible 
+sesob ber kora.

@@ -11,19 +11,21 @@ class CategoryListView(APIView):
     """
     View to list all categories.
     """
+    permission_classes=[]
 
     def get(self, request):
-        categories = Category.objects.filter(user=request.user)
+        categories = Category.objects.filter()
         serializer = CategorySerializer(categories, many=True)
         # many=True reason hosse jate kore ekadhik category return kora jay
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
 class CategoryCreateView(APIView):
+    permission_classes=[]
     def post(self, request):
         serializer = CategorySerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(user=request.user)
+            serializer.save()
         return Response(
             {
                 "status": "success",
@@ -36,6 +38,7 @@ class CategoryCreateView(APIView):
     
 
 class CategoryUpdateView(APIView):
+    permission_classes=[]
     def post(self, request):
         id = request.data.get("id")
         if not id:
@@ -49,7 +52,7 @@ class CategoryUpdateView(APIView):
         
 
         try:
-            if not Category.objects.filter(id=id, user=request.user).exists():
+            if not Category.objects.filter(id=id).exists():
                 return Response(
                     {
                         "status": "error",
@@ -57,7 +60,7 @@ class CategoryUpdateView(APIView):
                     },
                     status=status.HTTP_404_NOT_FOUND
                 )
-            category = Category.objects.get(id=id, user=request.user)
+            category = Category.objects.get(id=id)
             serializer = CategorySerializer(category, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -81,6 +84,7 @@ class CategoryUpdateView(APIView):
 
 
 class CaterogyDeleteView(APIView):
+    permission_classes=[]
     def post(self, request):
         id = request.data.get("id")
         if not id:
@@ -92,7 +96,7 @@ class CaterogyDeleteView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            if not Category.objects.filter(id=id, user=request.user).exists():
+            if not Category.objects.filter(id=id).exists():
                 return Response(
                     {
                         "status": "error",
@@ -100,7 +104,7 @@ class CaterogyDeleteView(APIView):
                     },
                     status=status.HTTP_404_NOT_FOUND
                 )
-            category = Category.objects.get(id=id, user=request.user)
+            category = Category.objects.get(id=id)
             category.delete()
             return Response(
                 {
@@ -120,6 +124,7 @@ class CaterogyDeleteView(APIView):
 
 
 class CategoryListIDView(APIView):
+    permission_classes=[]
     def post(self, request):
         id = request.data.get("id")
         if not id:
@@ -131,7 +136,7 @@ class CategoryListIDView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            category = Category.objects.get(id=id, user=request.user)
+            category = Category.objects.get(id=id)
             serializer = CategorySerializer(category)
             return Response(
                 {

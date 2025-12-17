@@ -1,6 +1,7 @@
 from django.db import models
 from customers.models import Customer
 from products.models import Product
+from users.models import User
 
 # Create your models here.
 
@@ -19,21 +20,28 @@ Invoice model for the inventory system.
 
 
 class Invoice(models.Model):
-    total = models.DecimalField(max_digits=10, decimal_places=2)
-    discount = models.DecimalField(max_digits=10, decimal_places=2)
-    vat = models.DecimalField(max_digits=10, decimal_places=2)
-    payable = models.DecimalField(max_digits=10, decimal_places=2)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    products = models.ManyToManyField(Product, through='InvoiceProduct')
+    customer = models.ForeignKey(Customer, on_delete=models.PROTECT, related_name='invoices')
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    discount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    vat = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    payable = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f"Invoice #{self.id} - {self.customer.name}"
 
-class InvoiceProduct(models.Model):
-    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+# Bridege table
+class InvoiceItem(models.Model):
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='invoice_items')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='sales')
     quantity = models.PositiveIntegerField()
     sale_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.product.name} - {self.quantity} @ {self.sale_price}"

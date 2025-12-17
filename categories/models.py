@@ -6,7 +6,6 @@ User = get_user_model()  # This will use the custom User model defined in users/
 # Create your models here.
 
 class Category(models.Model):
-    user = models.ForeignKey(User, on_delete=models.RESTRICT)
     name = models.CharField(max_length=255, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

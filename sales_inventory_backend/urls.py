@@ -10,7 +10,7 @@ api_urlpatterns = [
     path("",include("products.urls")),
     path("",include("categories.urls")),
     path("",include("customers.urls")),
-    # path("",include("invoices.urls")),
+    path("",include("invoices.urls")),
 ]
 
 urlpatterns = [
